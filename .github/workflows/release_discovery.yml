@@ -1,0 +1,37 @@
+name: pr-check
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          inventory-python:
+            - 'inventory/python/**'
+          resource-manager:
+            - 'resource-manager/python/**'
+          schellar:
+            - 'schellar/python/**'
+          topology-discovery:
+            - 'topology-discovery/python/**'
+          uniconfig:
+            - 'uniconfig/python/**'
+
+  build:
+    needs: changes
+    strategy:
+      matrix:
+        package: ${{ needs.changes.outputs.packages }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Echo module
+        run: echo ${{ matrix.package }}
