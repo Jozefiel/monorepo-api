@@ -13,8 +13,7 @@ mypy = "^1.3.0"
 pyright = "^1.1.317"
 
 [tool.poetry]
-packages = [{ include = "api" }]
-
+packages = [{ include = "frinx" }]
 name = "frinx-uniconfig-sdk"
 description = "Python SDK for Frinx Machine Workflow Manager"
 authors = ["Jozef Volak <jozef.volak@elisapolystar.com>"]

@@ -13,8 +13,7 @@ pyright = "^1.1.317"
 
 
 [tool.poetry]
-packages = [{ include = "api" }]
-
+packages = [{ include = "frinx" }]
 name = "frinx-resource-manager-api"
 description = "Frinx Resource Manager graphql schema transformed to pydantic BaseModels"
 authors = ["Jozef Volak <jozef.volak@elisapolystar.com>"]
