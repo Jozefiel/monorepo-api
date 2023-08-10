@@ -6,6 +6,7 @@ This package has been tested with Python 3.10.
 
 
 ## Getting started
+How to use it
 
 ### Prerequisites
 
