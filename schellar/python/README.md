@@ -1,6 +1,6 @@
 # Frinx Schellar Api in Python
 
-
+TEST
 Schellar Graphql Schema transformed to Pydantic basemodel.
 This package has been tested with Python 3.10.
 

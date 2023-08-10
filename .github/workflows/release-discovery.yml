@@ -1,0 +1,17 @@
+name: pr-create
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: 'Docker image name, eg: frinx/schellar:3.0.0'
+        required: true
+
+jobs:
+  pull-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        run: echo "${DOCKER_IMAGE}"
+        env:
+          DOCKER_IMAGE: ${{ inputs.image }}

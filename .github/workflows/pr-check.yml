@@ -1,0 +1,41 @@
+name: pr-check
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      python-api-packages: ${{ steps.python.outputs.changes }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dorny/paths-filter@v2
+      id: python
+      with:
+        filters: |
+          inventory:
+            - 'inventory/python/**'
+          resource-manager/python:
+            - 'resource-manager/python/**'
+          schellar:
+            - 'schellar/python/**'
+          topology-discovery/python:
+            - 'topology-discovery/python/**'
+          uniconfig:
+            - 'uniconfig/python/**'
+
+  python-api-build:
+    needs: changes
+    strategy:
+      matrix:
+        package: ${{ fromJSON(needs.changes.outputs.python-api-packages) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Echo module
+        run: cd ${{ matrix.package }}/python
