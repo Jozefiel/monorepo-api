@@ -18,7 +18,7 @@ name = "frinx-resource-manager-api"
 description = "Frinx Resource Manager graphql schema transformed to pydantic BaseModels"
 authors = ["Jozef Volak <jozef.volak@elisapolystar.com>"]
 version = "0" # dynamically generated
-readme = ["README.md", "CHANGELOG.md"]
+readme = ["README.md", "CHANGELOG.md", "RELEASE.md"]
 keywords = ["frinx-machine", "resource-manager", "api"]
 license = "Apache 2.0"
 
