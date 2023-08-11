@@ -4,8 +4,22 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
+  codespell:
+    name: Codespell
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v3
+      - name: Codespell
+        uses: codespell-project/actions-codespell@master
+        with:
+          ignore_words_list: test
+          check_filenames: true
+          check_hidden: false
+
   changes:
     runs-on: ubuntu-latest
     permissions:
@@ -14,28 +28,35 @@ jobs:
       python-api-packages: ${{ steps.python.outputs.changes }}
     steps:
     - uses: actions/checkout@v3
-    - uses: dorny/paths-filter@v2
-      id: python
+    - uses: chartboost/ruff-action@v1
+    - uses: tsuyoshicho/action-mypy@v3
       with:
-        filters: |
-          inventory:
-            - 'inventory/python/**'
-          resource-manager/python:
-            - 'resource-manager/python/**'
-          schellar:
-            - 'schellar/python/**'
-          topology-discovery/python:
-            - 'topology-discovery/python/**'
-          uniconfig:
-            - 'uniconfig/python/**'
+        github_token: ${{ secrets.github_token }}
+        reporter: github-pr-review
+        level: warning
+        workdir: .
+#    - uses: dorny/paths-filter@v2
+#      id: python
+#      with:
+#        filters: |
+#          inventory:
+#            - 'inventory/python/**'
+#          resource-manager/python:
+#            - 'resource-manager/python/**'
+#          schellar:
+#            - 'schellar/python/**'
+#          topology-discovery/python:
+#            - 'topology-discovery/python/**'
+#          uniconfig:
+#            - 'uniconfig/python/**'
 
-  python-api-build:
-    needs: changes
-    strategy:
-      matrix:
-        package: ${{ fromJSON(needs.changes.outputs.python-api-packages) }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Echo module
-        run: cd ${{ matrix.package }}/python
+#  python-api-check:
+#    needs: changes
+#    strategy:
+#      matrix:
+#        package: ${{ fromJSON(needs.changes.outputs.python-api-packages) }}
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Echo module
+#        run: cd ${{ matrix.package }}/python
