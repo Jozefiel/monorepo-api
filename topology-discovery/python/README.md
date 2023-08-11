@@ -1,6 +1,6 @@
 # Frinx Topology Discovery Api in Python
 
-
+TEST
 Topology Discovery Graphql Schema transformed to Pydantic basemodel.
 This package has been tested with Python 3.10.
 
