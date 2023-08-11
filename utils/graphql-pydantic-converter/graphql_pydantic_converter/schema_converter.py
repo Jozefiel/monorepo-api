@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import re
-import os
 from enum import Enum
 from string import Template
 from typing import Any
@@ -192,7 +191,7 @@ class GraphqlJsonParser:
         self.__create_refs()
 
     def __import_classes(self, items: dict[str, Any], worker_list: list[Optional[str]]) -> None:
-        kv_template = Template(f'from graphql_pydantic_converter.graphql_types import $type\n')
+        kv_template = Template('from graphql_pydantic_converter.graphql_types import $type\n')
 
         imports = [
             'from __future__ import annotations\n\n'

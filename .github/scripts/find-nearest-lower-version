@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+
+"""
+This script finds the nearest lower version of a Docker image in the release matrix table
+based on the provided version.
+
+Usage:
+    python find_nearest_lower_version.py --version 4.5.2 --path RELEASE.md
+
+Example:
+    python find_nearest_lower_version.py --version 4.5.2 --path RELEASE.md
+
+Input:
+    --image-tag: Version to find the nearest lower version for.
+    --path: Path to the RELEASE.md file.
+
+Output:
+    The nearest lower version of the Docker image based on the provided version.
+"""
+
+import re
+import argparse
+import sys
+from typing import Any
+from enum import Enum
+
+
+class Exit(Enum):
+    OK = 0
+    ERROR = 1
+
+
+def find_lower_versions(version: str, release_file: str) -> Any:
+    table_pattern = re.compile(r'\| Docker Image Tag \| Python Library Version \|\n\|(.+)\n', re.DOTALL)
+    match = table_pattern.search(release_file)
+    if match:
+        table = match.group(1).strip().split("\n")
+        table = table[1:]
+        lower_version: dict[str, Any] = {}
+        for row in table:
+            docker_version = row.split('|')[1]
+            lib_version = row.split('|')[2]
+            if docker_version.strip() < version:
+                lower_version = dict(
+                        docker=docker_version.strip(),
+                        lib=lib_version.strip(),
+                )
+            elif docker_version.strip() == version:
+                print(f'Version {version} already exist')
+                raise Exception()
+        return lower_version
+
+
+def main() -> Exit:
+    parser = argparse.ArgumentParser(description="Find nearest lower version of Docker image")
+    parser.add_argument("--image-tag", type=str, required=True, help="Version")
+    parser.add_argument("--path", type=str, required=True, help="RELEASE.md path")
+
+    args = parser.parse_args()
+
+    try:
+        with open(args.path, 'r') as f:
+            content = f.read()
+
+        version = find_lower_versions(args.image_tag, content)
+
+        print(f'LAST_DOCKER_TAG={version.get("docker", args.image_tag)}')
+        print(f'LAST_LIB_VERSION={version.get("lib", "1.0.0")}')
+
+    except Exception:
+        return Exit.ERROR
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+
+
