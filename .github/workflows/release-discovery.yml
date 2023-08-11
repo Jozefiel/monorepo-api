@@ -1,17 +1,90 @@
 name: pr-create
+
 on:
   workflow_dispatch:
     inputs:
       image:
         description: 'Docker image name, eg: frinx/schellar:3.0.0'
         required: true
+        default: 'frinx/schellar:latest'
 
 jobs:
   pull-image:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        run: echo "${DOCKER_IMAGE}"
+      - uses: actions/checkout@v3
+      - name: Parse docker
+        run: |
+          echo "IMAGE_NAMESPACE=$(echo $IMAGE | cut -d '/' -f 1)" >> "$GITHUB_ENV"
+          echo "IMAGE_REPO=$(echo $IMAGE | cut -d '/' -f 2 | cut -d ':' -f 1)" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG=$(echo $IMAGE | cut -d ':' -f 2)" >> "$GITHUB_ENV"
         env:
-          DOCKER_IMAGE: ${{ inputs.image }}
+          IMAGE: ${{ inputs.image }}
+      - name: Validate input
+        run: |                  
+          echo ${IMAGE_NAMESPACE}
+          if [[ "${IMAGE_NAMESPACE}" != "frinx" ]]; then
+            echo "Only images from frinx namespace can be used!"
+            exit 1
+          fi
+          
+          # Semantic version regex pattern
+          semantic_version_pattern='^[0-9]+\.[0-9]+\.[0-9]+$'
+          
+          if [[ "${IMAGE_TAG}" =~ $semantic_version_pattern ]]; then
+            echo "Valid semantic version: ${IMAGE_TAG}"
+          else
+            echo "Invalid semantic version: ${IMAGE_TAG}"
+            exit 1
+          fi
+
+      - name: Start service
+        run: |
+          echo "${IMAGE_NAMESPACE} ${IMAGE_REPO} ${IMAGE_TAG}"
+          docker compose -f ${IMAGE_REPO}/python/docker-compose.yml up -d
+
+      - name: Check changed files
+        uses: tj-actions/verify-changed-files@v16
+        id: verify-changed-files
+      - name: Update changelog
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: |
+          SCRIPT_PATH=".github/scripts"
+          
+          export $(${SCRIPT_PATH}/find-nearest-lower-version \
+              --image-tag ${IMAGE_TAG} \
+              --path ${IMAGE_REPO}/python/RELEASE.md)
+          
+          echo $LAST_DOCKER_TAG $LAST_LIB_VERSION
+          
+          LIB_VERSION=$(${SCRIPT_PATH}/versioning \
+              --last-image ${LAST_DOCKER_TAG} \
+              --new-image ${IMAGE_TAG} \
+              --last-lib ${LAST_LIB_VERSION})
+          
+          ${SCRIPT_PATH}/release-update \
+              --image-tag ${IMAGE_TAG} \
+              --lib-version ${LIB_VERSION} \
+              --path ${IMAGE_REPO}/python/RELEASE.md
+          
+          sed -i "s/version = \"[^\"]*\"/version = \"${LIB_VERSION}\"/g" ${IMAGE_REPO}/python/pyproject.toml
+
+      - uses: tibdex/github-app-token@v1
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        id: generate-token
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Create Pull Request
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: "[${{ env.IMAGE_REPO }}] Release package for ${{ inputs.image }}"
+          commit-message: "[${{ env.IMAGE_REPO }}] Create and publish packages for ${{ env.IMAGE_TAG }}"
+          branch-suffix: timestamp
+          labels: automated-pr
+          delete-branch: true
+          reviewers: Jozefiel
+          body: |
+            Create and publish packages for ${{ env.IMAGE_REPO }}
+          token: ${{ steps.generate-token.outputs.token }}

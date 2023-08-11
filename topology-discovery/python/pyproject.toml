@@ -18,7 +18,7 @@ name = "frinx-topology-discovery-api"
 description = "Frinx Topology Discovery graphql schema transformed to pydantic basemodels"
 authors = ["Jozef Volak <jozef.volak@elisapolystar.com>"]
 version = "0"
-readme = ["README.md", "CHANGELOG.md"]
+readme = ["README.md", "CHANGELOG.md", "RELEASE.md"]
 keywords = ["frinx-machine", "topology-discovery", "api"]
 license = "Apache 2.0"
 

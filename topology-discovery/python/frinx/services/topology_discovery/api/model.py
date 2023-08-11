@@ -4,11 +4,11 @@ import typing
 
 from pydantic import Field
 
-from frinx.common.graphql.graphql_types import ENUM
-from frinx.common.graphql.graphql_types import Input
-from frinx.common.graphql.graphql_types import Interface
-from frinx.common.graphql.graphql_types import Payload
-from frinx.common.graphql.graphql_types import Query
+from graphql_pydantic_converter.graphql_types import ENUM
+from graphql_pydantic_converter.graphql_types import Input
+from graphql_pydantic_converter.graphql_types import Interface
+from graphql_pydantic_converter.graphql_types import Payload
+from graphql_pydantic_converter.graphql_types import Query
 
 ID: typing.TypeAlias = str
 Int: typing.TypeAlias = int
