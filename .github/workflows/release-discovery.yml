@@ -1,17 +1,39 @@
 name: pr-create
+
 on:
   workflow_dispatch:
     inputs:
       image:
         description: 'Docker image name, eg: frinx/schellar:3.0.0'
         required: true
+        default: 'frinx/schellar:latest'
 
 jobs:
   pull-image:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        run: echo "${DOCKER_IMAGE}"
+      - uses: actions/checkout@v2
+      - name: Validate input
+        run: |
+          echo "IMAGE_NAMESPACE=$(echo $IMAGE | cut -d '/' -f 1)" >> "$GITHUB_ENV"
+          echo "IMAGE_REPO=$(echo $IMAGE | cut -d '/' -f 2 | cut -d ':' -f 1)" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG=$(echo $IMAGE | cut -d ':' -f 2)" >> "$GITHUB_ENV"
         env:
-          DOCKER_IMAGE: ${{ inputs.image }}
+          IMAGE: ${{ inputs.image }}
+      - name: Start service
+        run: |
+          echo "${IMAGE_NAMESPACE} ${IMAGE_REPO} ${IMAGE_TAG}"
+          docker compose -f ${IMAGE_REPO}/python/docker-compose.yml up -d
+      - name: show diff
+        run: sleep 2 && git diff .
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: ${{ env.IMAGE_REPO }} Release package for ${{ env.IMAGE_TAG }}
+          commit-message: '[${IMAGE_REPO}]'
+          branch: example-patches
+          labels: automated-pr
+          delete-branch: true
+          body: |
+            Update report
+            - Updated with *today's* date
