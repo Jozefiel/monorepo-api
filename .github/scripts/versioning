@@ -1,0 +1,80 @@
+#!/bin/env python3
+
+"""
+This script provides a utility for semantic versioning.
+
+It allows you to determine the version change type (MAJOR, MINOR, PATCH)
+based on comparing old and new versions, and also bump the version
+accordingly.
+
+Usage:
+    python versioning.py --last-image 1.0.0  --new-image 2.0.1 --last-lib 1.0.0
+
+Output:
+    LEVEL=MAJOR
+    VERSION=2.0.0
+"""
+
+import argparse
+from enum import Enum, auto
+
+
+class SemanticVersion(Enum):
+    PATCH = auto()
+    MINOR = auto()
+    MAJOR = auto()
+
+
+def parse_version(version: str):
+    major, minor, patch = map(int, version.split('.'))
+    return major, minor, patch
+
+
+def get_version_change(old_version: str, new_version: str):
+    old_major, old_minor, old_patch = parse_version(old_version)
+    new_major, new_minor, new_patch = parse_version(new_version)
+
+    if new_major > old_major:
+        return SemanticVersion.MAJOR
+    elif new_minor > old_minor:
+        return SemanticVersion.MINOR
+    elif new_patch > old_patch:
+        return SemanticVersion.PATCH
+
+
+def bump_version(old_version: str, version_change: SemanticVersion):
+    major, minor, patch = parse_version(old_version)
+
+    if version_change is SemanticVersion.PATCH:
+        patch += 1
+    elif version_change is SemanticVersion.MINOR:
+        minor += 1
+        patch = 0
+    elif version_change is SemanticVersion.MAJOR:
+        major += 1
+        minor = 0
+        patch = 0
+
+    return f"{major}.{minor}.{patch}"
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Semantic Versioning Utility")
+    parser.add_argument("--last-image", type=str, required=True,  help="Old docker image version")
+    parser.add_argument("--new-image", type=str, required=True, help="New docker image version")
+    parser.add_argument("--last-lib", type=str, required=True, help="Old package version")
+    parser.add_argument("--output", type=str, default='VERSION', choices=['VERSION', 'LEVEL'],  help="Old package version")
+
+    args = parser.parse_args()
+
+    version_change = get_version_change(args.last_image, args.new_image)
+    bumped_version = bump_version(args.last_lib, version_change)
+
+    if args.output == "VERSION":
+        print(bumped_version)
+    elif args.output == "LEVEL":
+        print(version_change)
+
+
+if __name__ == "__main__":
+    main()

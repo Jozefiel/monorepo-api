@@ -1,0 +1,68 @@
+#!/bin/env python3
+
+"""
+This script updates the release matrix table in a RELEASE.md file
+by adding a new row with the specified Docker image tag and Python library version.
+
+Usage:
+    python release-update.py --image-tag 4.0.0 --lib-version 2.0.0 --path RELEASE.md
+
+Example:
+    python release-update.py --image-tag 4.0.0 --lib-version 2.0.0 --path RELEASE.md
+
+Input:
+    --image-tag: Docker image tag.
+    --lib-version: Python library version.
+    --path: Path to the RELEASE.md file.
+
+Output:
+    The specified RELEASE.md file will be updated with the new row in the release matrix table.
+"""
+
+
+import re
+import argparse
+
+
+def find_insertion_index(table, version):
+    for i, row in enumerate(table):
+        docker_version = row.split('|')[1].strip()
+        if docker_version >= version:
+            return i
+    return len(table)
+
+
+def update_release_matrix(release_file: str, image_tag: str, lib_version: str) -> None:
+    with open(release_file, 'r') as f:
+        content = f.read()
+
+    table_pattern = re.compile(r'\| Docker Image Tag \| Python Library Version \|\n\|(.+)', re.DOTALL)
+    match = table_pattern.search(content)
+
+    if match:
+        table = match.group(1).strip().split("\n")
+        new_row = f"| {image_tag} | {lib_version} |"
+        insertion_index = find_insertion_index(table, image_tag)
+
+        table.insert(insertion_index, new_row)
+        updated_table = "\n".join(table)
+        updated_content = content.replace(table_pattern.search(content).group(1), updated_table)
+        with open(release_file, 'w') as f:
+            f.write(updated_content)
+
+    else:
+        print("Table not found in the release file.")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Update release table with new package")
+    parser.add_argument("--image-tag", type=str, required=True,  help="Docker tag")
+    parser.add_argument("--lib-version", type=str, required=True, help="Python library version")
+    parser.add_argument("--path", type=str, required=True, help="RELEASE.md path")
+
+    args = parser.parse_args()
+    update_release_matrix(release_file=args.path, image_tag=args.image_tag, lib_version=args.lib_version)
+
+
+if __name__ == "__main__":
+    main()
