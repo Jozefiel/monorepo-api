@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  uniconfig-controller:
+    user: root
+    image: frinx/uniconfig:${IMAGE_TAG:?}
+    entrypoint: cp openapi/uniconfigV3.yaml /home/api/
+    volumes:
+      - uniconfig-swagger:/home/api
+
+  converter:
+    image: koxudaxi/datamodel-code-generator
+    depends_on:
+      uniconfig-controller:
+        condition: service_completed_successfully
+    volumes:
+      - ./frinx/services/uniconfig/api/:/home/
+      - uniconfig-swagger:/home/api
+    command:
+      - --disable-timestamp
+      - --enable-version-header
+      - --use-schema-description
+      - --use-field-description
+      - --allow-population-by-field-name
+      - --use-standard-collections
+      - --reuse-model
+      - --openapi-scopes
+      - paths
+      - --input
+      - /home/api/uniconfigV3.yaml
+      - --output
+      - /home/
+volumes:
+  uniconfig-swagger:
+    name: uniconfig-swagger

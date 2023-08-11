@@ -4,12 +4,12 @@ import typing
 
 from pydantic import Field
 
-from frinx.common.graphql.graphql_types import ENUM
-from frinx.common.graphql.graphql_types import Input
-from frinx.common.graphql.graphql_types import Interface
-from frinx.common.graphql.graphql_types import Mutation
-from frinx.common.graphql.graphql_types import Payload
-from frinx.common.graphql.graphql_types import Query
+from graphql_pydantic_converter.graphql_types import ENUM
+from graphql_pydantic_converter.graphql_types import Input
+from graphql_pydantic_converter.graphql_types import Interface
+from graphql_pydantic_converter.graphql_types import Mutation
+from graphql_pydantic_converter.graphql_types import Payload
+from graphql_pydantic_converter.graphql_types import Query
 
 Boolean: typing.TypeAlias = bool
 Cursor: typing.TypeAlias = typing.Any
