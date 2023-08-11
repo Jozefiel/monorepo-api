@@ -34,4 +34,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Echo module
-        run: echo {{ $package }}
+        run: echo ${{ matrix.package }}
