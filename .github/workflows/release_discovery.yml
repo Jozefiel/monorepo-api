@@ -8,6 +8,10 @@ on:
 jobs:
   changes:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      packages: ${{ steps.filter.outputs.changes }}
     steps:
     - uses: actions/checkout@v3
     - uses: dorny/paths-filter@v2
@@ -29,10 +33,10 @@ jobs:
     needs: changes
     strategy:
       matrix:
-        package: ${{ needs.changes.outputs.packages }}
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Echo module
         run: echo ${{ matrix.package }}
-
+ 
