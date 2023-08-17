@@ -33,13 +33,15 @@ class Exit(Enum):
 def find_lower_versions(version: str, release_file: str) -> Any:
     table_pattern = re.compile(r'\| Docker Image Tag \| Python Library Version \|\n\|(.+)\n', re.DOTALL)
     match = table_pattern.search(release_file)
+    print(match)
     if match:
         table = match.group(1).strip().split("\n")
         table = table[1:]
-        lower_version: dict[str, Any] = {}
+        lower_version = {}
         for row in table:
             docker_version = row.split('|')[1]
             lib_version = row.split('|')[2]
+            print(docker_version, lib_version)
             if docker_version.strip() < version:
                 lower_version = dict(
                         docker=docker_version.strip(),
@@ -63,11 +65,15 @@ def main() -> Exit:
             content = f.read()
 
         version = find_lower_versions(args.image_tag, content)
+        if version:
+          print(f'LAST_DOCKER_TAG={version.get("docker", args.image_tag)}')
+          print(f'LAST_LIB_VERSION={version.get("lib", "1.0.0")}')
+        else:
+          print(f'LAST_DOCKER_TAG={args.image_tag}')
+          print(f'LAST_LIB_VERSION=1.0.0')
 
-        print(f'LAST_DOCKER_TAG={version.get("docker", args.image_tag)}')
-        print(f'LAST_LIB_VERSION={version.get("lib", "1.0.0")}')
-
-    except Exception:
+    except Exception as error:
+        print(error)
         return Exit.ERROR
 
 

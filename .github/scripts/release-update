@@ -36,8 +36,13 @@ def update_release_matrix(release_file: str, image_tag: str, lib_version: str) -
     with open(release_file, 'r') as f:
         content = f.read()
 
+    print(content) 
+
     table_pattern = re.compile(r'\| Docker Image Tag \| Python Library Version \|\n\|(.+)', re.DOTALL)
     match = table_pattern.search(content)
+
+
+    print(match)
 
     if match:
         table = match.group(1).strip().split("\n")
