@@ -20,7 +20,7 @@ jobs:
           check_filenames: true
           check_hidden: false
 
-  changes:
+  ruff:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
@@ -35,28 +35,3 @@ jobs:
         reporter: github-pr-review
         level: warning
         workdir: .
-#    - uses: dorny/paths-filter@v2
-#      id: python
-#      with:
-#        filters: |
-#          inventory:
-#            - 'inventory/python/**'
-#          resource-manager/python:
-#            - 'resource-manager/python/**'
-#          schellar:
-#            - 'schellar/python/**'
-#          topology-discovery/python:
-#            - 'topology-discovery/python/**'
-#          uniconfig:
-#            - 'uniconfig/python/**'
-
-#  python-api-check:
-#    needs: changes
-#    strategy:
-#      matrix:
-#        package: ${{ fromJSON(needs.changes.outputs.python-api-packages) }}
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: Echo module
-#        run: cd ${{ matrix.package }}/python

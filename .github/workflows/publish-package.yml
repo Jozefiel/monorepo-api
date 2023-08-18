@@ -1,0 +1,51 @@
+name: Publish Frinx Services API
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      python-api-packages: ${{ steps.python.outputs.changes }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: python
+        with:
+          filters: |
+            inventory:
+              - 'inventory/python/**'
+            resource-manager/python:
+              - 'resource-manager/python/**'
+            schellar:
+              - 'schellar/python/**'
+            topology-discovery/python:
+              - 'topology-discovery/python/**'
+            uniconfig:
+              - 'uniconfig/python/**'
+
+  build-n-publish-pypi:
+    needs: changes
+    if: ${{ needs.changes.outputs.python-api-packages != '[]' && needs.changes.outputs.python-api-packages != '' }}
+    strategy:
+      fail-fast: true
+      matrix:
+        package: ${{ fromJSON(needs.changes.outputs.python-api-packages) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.4.2"
+      - name: poetry publish
+        run: |
+          cd ${{ matrix.package }}/python
+          poetry publish --build --dry-run  # -u "__token__" -p "${{ secrets.PYPI_TOKEN }}"

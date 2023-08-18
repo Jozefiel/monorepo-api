@@ -9,7 +9,7 @@ on:
         default: 'frinx/schellar:latest'
 
 jobs:
-  pull-image:
+  generate-api-from-image:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
