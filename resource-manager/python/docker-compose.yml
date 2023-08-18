@@ -34,7 +34,7 @@ services:
       resource-manager:
         condition: service_healthy
     volumes:
-      - ./frinx/services/resource-manager/api/:/home/
+      - ./frinx/services/resource_manager/api/:/home/
     command: "--url http://resource-manager:8884/query \
       --headers 'x-tenant-id: frinx' 'from: worker' \
       -o /home/model.py"

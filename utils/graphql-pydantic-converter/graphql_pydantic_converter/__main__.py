@@ -1,17 +1,24 @@
 #! /usr/bin/env python
 
 from __future__ import annotations
+
+import json
 import sys
+from argparse import ArgumentParser
+from argparse import Namespace
+from collections.abc import Sequence
+from enum import IntEnum
+from pathlib import Path
+from typing import Any
+from typing import Optional
+
+import requests
+from pydantic import BaseModel
 
 import graphql_pydantic_converter.graphql_types
 from graphql_pydantic_converter.schema_converter import GraphqlJsonParser
-from argparse import ArgumentParser, Namespace
-from typing import Optional, Sequence, Any
-from enum import IntEnum
-import json
-from pydantic import BaseModel
-from pathlib import Path
-import requests
+
+EXPECTED_HEADERS_PARTS = 2
 
 # PARSERS
 arg_parser = ArgumentParser()
@@ -42,7 +49,7 @@ def parse_headers(headers):
     dict_headers = {}
     for header in headers:
         header_parts = header.split(':')
-        if len(header_parts) == 2:
+        if len(header_parts) == EXPECTED_HEADERS_PARTS:
             dict_headers[header_parts[0].strip()] = header_parts[1].strip()
     return dict_headers
 
@@ -68,19 +75,19 @@ def main(args: Optional[Sequence[str]] = None) -> Exit:
 
             response = requests.post(
                 config.url,
-                data=json.dumps({"query": graphql_pydantic_converter.graphql_types.schema_request}),
-                headers={"Content-Type": "application/json"} | headers
+                data=json.dumps({'query': graphql_pydantic_converter.graphql_types.schema_request}),
+                headers={'Content-Type': 'application/json'} | headers
             )
             if response.ok:
                 json_data = response.json()
             else:
-                raise ValueError(f"Failed to fetch JSON from URL: {config.url}")
+                raise ValueError(f'Failed to fetch JSON from URL: {config.url}')
         elif config.input_file is not None:
             with open(config.input_file) as file:
                 json_data = json.load(file)
                 file.close()
         else:
-            raise ValueError("input-file or url must be provided")
+            raise ValueError('input-file or url must be provided')
 
         if config.output_file:
             GraphqlJsonParser(json_data).export(str(config.output_file.absolute()))

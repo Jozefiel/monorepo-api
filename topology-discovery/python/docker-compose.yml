@@ -30,5 +30,5 @@ services:
       topology-discovery:
         condition: service_healthy
     volumes:
-      - ./frinx/services/topology-discovery/api/:/home/
+      - ./frinx/services/topology_discovery/api/:/home/
     command: '--url http://topology-discovery:5000/api/graphql -o /home/model.py'
