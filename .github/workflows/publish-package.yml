@@ -17,15 +17,15 @@ jobs:
         id: python
         with:
           filters: |
-            inventory:
+            inventory/python:
               - 'inventory/python/**'
             resource-manager/python:
               - 'resource-manager/python/**'
-            schellar:
+            schellar/python:
               - 'schellar/python/**'
             topology-discovery/python:
               - 'topology-discovery/python/**'
-            uniconfig:
+            uniconfig/python:
               - 'uniconfig/python/**'
 
   build-n-publish-pypi:
@@ -47,5 +47,5 @@ jobs:
           poetry-version: "1.4.2"
       - name: poetry publish
         run: |
-          cd ${{ matrix.package }}/python
+          cd ${{ matrix.package }}
           poetry publish --build --dry-run  # -u "__token__" -p "${{ secrets.PYPI_TOKEN }}"

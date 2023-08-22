@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import typing
 
-from pydantic import Field
-
 from graphql_pydantic_converter.graphql_types import ENUM
 from graphql_pydantic_converter.graphql_types import Input
 from graphql_pydantic_converter.graphql_types import Interface
 from graphql_pydantic_converter.graphql_types import Payload
 from graphql_pydantic_converter.graphql_types import Query
+from pydantic import Field
 
 ID: typing.TypeAlias = str
 Int: typing.TypeAlias = int
@@ -25,39 +24,6 @@ class NodeStatus(ENUM):
 class NetRoutingPathOutputCollections(ENUM):
     NetDevice = 'NetDevice'
     NetInterface = 'NetInterface'
-
-
-class __TypeKind(ENUM):
-    SCALAR = 'SCALAR'
-    OBJECT = 'OBJECT'
-    INTERFACE = 'INTERFACE'
-    UNION = 'UNION'
-    ENUM = 'ENUM'
-    INPUT_OBJECT = 'INPUT_OBJECT'
-    LIST = 'LIST'
-    NON_NULL = 'NON_NULL'
-
-
-class __DirectiveLocation(ENUM):
-    QUERY = 'QUERY'
-    MUTATION = 'MUTATION'
-    SUBSCRIPTION = 'SUBSCRIPTION'
-    FIELD = 'FIELD'
-    FRAGMENT_DEFINITION = 'FRAGMENT_DEFINITION'
-    FRAGMENT_SPREAD = 'FRAGMENT_SPREAD'
-    INLINE_FRAGMENT = 'INLINE_FRAGMENT'
-    VARIABLE_DEFINITION = 'VARIABLE_DEFINITION'
-    SCHEMA = 'SCHEMA'
-    SCALAR = 'SCALAR'
-    OBJECT = 'OBJECT'
-    FIELD_DEFINITION = 'FIELD_DEFINITION'
-    ARGUMENT_DEFINITION = 'ARGUMENT_DEFINITION'
-    INTERFACE = 'INTERFACE'
-    UNION = 'UNION'
-    ENUM = 'ENUM'
-    ENUM_VALUE = 'ENUM_VALUE'
-    INPUT_OBJECT = 'INPUT_OBJECT'
-    INPUT_FIELD_DEFINITION = 'INPUT_FIELD_DEFINITION'
 
 
 class Node(Interface):
@@ -129,7 +95,10 @@ class NetDevice(Payload):
     ospf_area_id: typing.Optional[Boolean] = Field(response='String', alias='ospfAreaId', default=True)
     phy_device: typing.Optional[PhyDevice] = Field(response='PhyDevice', alias='phyDevice')
     net_networks: typing.Optional[NetNetworkConnection] = Field(response='NetNetworkConnection', alias='netNetworks')
-    net_interfaces: typing.Optional[NetInterfaceConnection] = Field(response='NetInterfaceConnection', alias='netInterfaces')
+    net_interfaces: typing.Optional[NetInterfaceConnection] = Field(
+        response='NetInterfaceConnection',
+        alias='netInterfaces'
+    )
 
 
 class NetDeviceEdge(Payload):
@@ -239,61 +208,6 @@ class PhyInterfaceConnection(Payload):
     edges: typing.Optional[PhyInterfaceEdge] = Field(response='PhyInterfaceEdge')
 
 
-class __Schema(Payload):
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    types: typing.Optional[__Type] = Field(response='__Type')
-    query_type: typing.Optional[__Type] = Field(response='__Type', alias='queryType')
-    mutation_type: typing.Optional[__Type] = Field(response='__Type', alias='mutationType')
-    subscription_type: typing.Optional[__Type] = Field(response='__Type', alias='subscriptionType')
-    directives: typing.Optional[__Directive] = Field(response='__Directive')
-
-
-class __Type(Payload):
-    kind: typing.Optional[Boolean] = Field(response='__TypeKind', default=True)
-    name: typing.Optional[Boolean] = Field(response='String', default=True)
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    specified_by_url: typing.Optional[Boolean] = Field(response='String', alias='specifiedByURL', default=True)
-    fields: typing.Optional[__Field] = Field(response='__Field')
-    interfaces: typing.Optional[__Type] = Field(response='__Type')
-    possible_types: typing.Optional[__Type] = Field(response='__Type', alias='possibleTypes')
-    enum_values: typing.Optional[__EnumValue] = Field(response='__EnumValue', alias='enumValues')
-    input_fields: typing.Optional[__InputValue] = Field(response='__InputValue', alias='inputFields')
-    of_type: typing.Optional[__Type] = Field(response='__Type', alias='ofType')
-
-
-class __Field(Payload):
-    name: typing.Optional[Boolean] = Field(response='String', default=True)
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    args: typing.Optional[__InputValue] = Field(response='__InputValue')
-    type: typing.Optional[__Type] = Field(response='__Type')
-    is_deprecated: typing.Optional[Boolean] = Field(response='Boolean', alias='isDeprecated', default=True)
-    deprecation_reason: typing.Optional[Boolean] = Field(response='String', alias='deprecationReason', default=True)
-
-
-class __InputValue(Payload):
-    name: typing.Optional[Boolean] = Field(response='String', default=True)
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    type: typing.Optional[__Type] = Field(response='__Type')
-    default_value: typing.Optional[Boolean] = Field(response='String', alias='defaultValue', default=True)
-    is_deprecated: typing.Optional[Boolean] = Field(response='Boolean', alias='isDeprecated', default=True)
-    deprecation_reason: typing.Optional[Boolean] = Field(response='String', alias='deprecationReason', default=True)
-
-
-class __EnumValue(Payload):
-    name: typing.Optional[Boolean] = Field(response='String', default=True)
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    is_deprecated: typing.Optional[Boolean] = Field(response='Boolean', alias='isDeprecated', default=True)
-    deprecation_reason: typing.Optional[Boolean] = Field(response='String', alias='deprecationReason', default=True)
-
-
-class __Directive(Payload):
-    name: typing.Optional[Boolean] = Field(response='String', default=True)
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    is_repeatable: typing.Optional[Boolean] = Field(response='Boolean', alias='isRepeatable', default=True)
-    locations: typing.Optional[Boolean] = Field(response='__DirectiveLocation', default=True)
-    args: typing.Optional[__InputValue] = Field(response='__InputValue')
-
-
 Node.update_forward_refs()
 NetDeviceFilter.update_forward_refs()
 NetInterfaceFilter.update_forward_refs()
@@ -325,9 +239,4 @@ PhyDeviceDetails.update_forward_refs()
 PhyInterface.update_forward_refs()
 PhyInterfaceEdge.update_forward_refs()
 PhyInterfaceConnection.update_forward_refs()
-__Schema.update_forward_refs()
-__Type.update_forward_refs()
-__Field.update_forward_refs()
-__InputValue.update_forward_refs()
-__EnumValue.update_forward_refs()
-__Directive.update_forward_refs()
+

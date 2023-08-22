@@ -46,6 +46,27 @@ jobs:
       - name: Check changed files
         uses: tj-actions/verify-changed-files@v16
         id: verify-changed-files
+
+      - if: steps.verify-changed-files.outputs.files_changed == 'true'
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - if: steps.verify-changed-files.outputs.files_changed == 'true'
+        name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.4.2"
+
+      - name: Formatting and validating
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: |
+          pushd ${IMAGE_REPO}/python/ || exit 1
+            poetry install
+            poetry run ruff --fix .
+            poetry run mypy .
+            poetry run pyright .
+          popd || exit 1
       - name: Update changelog
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
@@ -67,7 +88,7 @@ jobs:
               --lib-version ${LIB_VERSION} \
               --path ${IMAGE_REPO}/python/RELEASE.md
           
-          sed -i "s/version = \"[^\"]*\"/version = \"${LIB_VERSION}\"/g" ${IMAGE_REPO}/python/pyproject.toml
+          sed -i "s/^version = \"[^\"]*\"/version = \"${LIB_VERSION}\"/g" ${IMAGE_REPO}/python/pyproject.toml
 
       - uses: tibdex/github-app-token@v1
         if: steps.verify-changed-files.outputs.files_changed == 'true'

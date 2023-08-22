@@ -39,5 +39,5 @@ services:
       inventory:
         condition: service_healthy
     volumes:
-      - ./frinx/services/inventory/api/:/home/
-    command: '--url http://inventory:8000/graphql -o /home/model.py'
+      - ./frinx_api/inventory/:/home/
+    command: '--url http://inventory:8000/graphql -o /home/__init__.py'
