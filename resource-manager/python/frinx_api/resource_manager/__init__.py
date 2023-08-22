@@ -11,6 +11,7 @@ from graphql_pydantic_converter.graphql_types import Query
 from pydantic import Field
 
 Boolean: typing.TypeAlias = bool
+Cursor: typing.TypeAlias = typing.Any
 Float: typing.TypeAlias = float
 ID: typing.TypeAlias = str
 Int: typing.TypeAlias = int
@@ -70,6 +71,7 @@ class CreateNestedSetPoolInput(Input):
     pool_values: typing.Optional[list[Map]] = Field(alias='poolValues')
     resource_type_id: ID = Field(alias='resourceTypeId')
     tags: typing.Optional[list[String]]
+
 
 class CreateNestedSingletonPoolInput(Input):
     description: typing.Optional[String]
@@ -462,14 +464,23 @@ class QueryResourcePoolQuery(Query):
 class QueryEmptyResourcePoolsQuery(Query):
     _name: str = Field('QueryEmptyResourcePools', const=True)
     resource_type_id: typing.Optional[ID] = Field(alias='resourceTypeId')
-    payload: ResourcePool
+    first: typing.Optional[Int]
+    last: typing.Optional[Int]
+    before: typing.Optional[Cursor]
+    after: typing.Optional[Cursor]
+    payload: ResourcePoolConnection
 
 
 class QueryResourcePoolsQuery(Query):
     _name: str = Field('QueryResourcePools', const=True)
     resource_type_id: typing.Optional[ID] = Field(alias='resourceTypeId')
     tags: typing.Optional[TagOr]
-    payload: ResourcePool
+    first: typing.Optional[Int]
+    last: typing.Optional[Int]
+    before: typing.Optional[Cursor]
+    after: typing.Optional[Cursor]
+    filter_by_resources: typing.Optional[Map] = Field(alias='filterByResources')
+    payload: ResourcePoolConnection
 
 
 class QueryRecentlyActiveResourcesQuery(Query):
@@ -493,20 +504,34 @@ class QueryRootResourcePoolsQuery(Query):
     _name: str = Field('QueryRootResourcePools', const=True)
     resource_type_id: typing.Optional[ID] = Field(alias='resourceTypeId')
     tags: typing.Optional[TagOr]
-    payload: ResourcePool
+    first: typing.Optional[Int]
+    last: typing.Optional[Int]
+    before: typing.Optional[Cursor]
+    after: typing.Optional[Cursor]
+    filter_by_resources: typing.Optional[Map] = Field(alias='filterByResources')
+    payload: ResourcePoolConnection
 
 
 class QueryLeafResourcePoolsQuery(Query):
     _name: str = Field('QueryLeafResourcePools', const=True)
     resource_type_id: typing.Optional[ID] = Field(alias='resourceTypeId')
     tags: typing.Optional[TagOr]
-    payload: ResourcePool
+    first: typing.Optional[Int]
+    last: typing.Optional[Int]
+    before: typing.Optional[Cursor]
+    after: typing.Optional[Cursor]
+    filter_by_resources: typing.Optional[Map] = Field(alias='filterByResources')
+    payload: ResourcePoolConnection
 
 
 class SearchPoolsByTagsQuery(Query):
     _name: str = Field('SearchPoolsByTags', const=True)
     tags: typing.Optional[TagOr]
-    payload: ResourcePool
+    first: typing.Optional[Int]
+    last: typing.Optional[Int]
+    before: typing.Optional[Cursor]
+    after: typing.Optional[Cursor]
+    payload: ResourcePoolConnection
 
 
 class QueryTagsQuery(Query):
@@ -551,6 +576,17 @@ class ResourcePool(Payload):
     tags: typing.Optional[Tag] = Field(response='Tag', alias='Tags')
     allocated_resources: typing.Optional[ResourceConnection] = Field(response='ResourceConnection', alias='allocatedResources')
     id: typing.Optional[Boolean] = Field(response='ID', default=True)
+
+
+class ResourcePoolConnection(Payload):
+    edges: typing.Optional[ResourcePoolEdge] = Field(response='ResourcePoolEdge')
+    page_info: typing.Optional[PageInfo] = Field(response='PageInfo', alias='pageInfo')
+    total_count: typing.Optional[Boolean] = Field(response='Int', alias='totalCount', default=True)
+
+
+class ResourcePoolEdge(Payload):
+    cursor: typing.Optional[OutputCursor] = Field(response='OutputCursor')
+    node: typing.Optional[ResourcePool] = Field(response='ResourcePool')
 
 
 class ResourceType(Payload):
@@ -667,6 +703,8 @@ Resource.update_forward_refs()
 ResourceConnection.update_forward_refs()
 ResourceEdge.update_forward_refs()
 ResourcePool.update_forward_refs()
+ResourcePoolConnection.update_forward_refs()
+ResourcePoolEdge.update_forward_refs()
 ResourceType.update_forward_refs()
 Tag.update_forward_refs()
 TagPoolPayload.update_forward_refs()
