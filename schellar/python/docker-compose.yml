@@ -40,5 +40,5 @@ services:
       schellar:
         condition: service_healthy
     volumes:
-      - ./frinx/services/schellar/api/:/home/
-    command: '--url http://schellar:3000/query -o /home/model.py'
+      - ./frinx_api/schellar/:/home/
+    command: '--url http://schellar:3000/query -o /home/__init__.py'

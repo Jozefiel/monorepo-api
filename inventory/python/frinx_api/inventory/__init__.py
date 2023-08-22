@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import typing
 
-from pydantic import Field
-
 from graphql_pydantic_converter.graphql_types import ENUM
 from graphql_pydantic_converter.graphql_types import Input
 from graphql_pydantic_converter.graphql_types import Interface
@@ -11,6 +9,7 @@ from graphql_pydantic_converter.graphql_types import Mutation
 from graphql_pydantic_converter.graphql_types import Payload
 from graphql_pydantic_converter.graphql_types import Query
 from graphql_pydantic_converter.graphql_types import Subscription
+from pydantic import Field
 
 ID: typing.TypeAlias = str
 String: typing.TypeAlias = str
@@ -51,39 +50,6 @@ class SortDirection(ENUM):
 class GraphEdgeStatus(ENUM):
     ok = 'ok'
     unknown = 'unknown'
-
-
-class __TypeKind(ENUM):
-    SCALAR = 'SCALAR'
-    OBJECT = 'OBJECT'
-    INTERFACE = 'INTERFACE'
-    UNION = 'UNION'
-    ENUM = 'ENUM'
-    INPUT_OBJECT = 'INPUT_OBJECT'
-    LIST = 'LIST'
-    NON_NULL = 'NON_NULL'
-
-
-class __DirectiveLocation(ENUM):
-    QUERY = 'QUERY'
-    MUTATION = 'MUTATION'
-    SUBSCRIPTION = 'SUBSCRIPTION'
-    FIELD = 'FIELD'
-    FRAGMENT_DEFINITION = 'FRAGMENT_DEFINITION'
-    FRAGMENT_SPREAD = 'FRAGMENT_SPREAD'
-    INLINE_FRAGMENT = 'INLINE_FRAGMENT'
-    VARIABLE_DEFINITION = 'VARIABLE_DEFINITION'
-    SCHEMA = 'SCHEMA'
-    SCALAR = 'SCALAR'
-    OBJECT = 'OBJECT'
-    FIELD_DEFINITION = 'FIELD_DEFINITION'
-    ARGUMENT_DEFINITION = 'ARGUMENT_DEFINITION'
-    INTERFACE = 'INTERFACE'
-    UNION = 'UNION'
-    ENUM = 'ENUM'
-    ENUM_VALUE = 'ENUM_VALUE'
-    INPUT_OBJECT = 'INPUT_OBJECT'
-    INPUT_FIELD_DEFINITION = 'INPUT_FIELD_DEFINITION'
 
 
 class Node(Interface):
@@ -220,6 +186,7 @@ class Device(Payload):
     updated_at: typing.Optional[Boolean] = Field(response='String', alias='updatedAt', default=True)
     model: typing.Optional[Boolean] = Field(response='String', default=True)
     vendor: typing.Optional[Boolean] = Field(response='String', default=True)
+    port: typing.Optional[Boolean] = Field(response='Int', default=True)
     address: typing.Optional[Boolean] = Field(response='String', default=True)
     mount_parameters: typing.Optional[Boolean] = Field(response='String', alias='mountParameters', default=True)
     source: typing.Optional[Boolean] = Field(response='DeviceSource', default=True)
@@ -846,61 +813,6 @@ class UniconfigShellSubscription(Subscription):
     payload: Boolean
 
 
-class __Schema(Payload):
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    types: typing.Optional[__Type] = Field(response='__Type')
-    query_type: typing.Optional[__Type] = Field(response='__Type', alias='queryType')
-    mutation_type: typing.Optional[__Type] = Field(response='__Type', alias='mutationType')
-    subscription_type: typing.Optional[__Type] = Field(response='__Type', alias='subscriptionType')
-    directives: typing.Optional[__Directive] = Field(response='__Directive')
-
-
-class __Type(Payload):
-    kind: typing.Optional[Boolean] = Field(response='__TypeKind', default=True)
-    name: typing.Optional[Boolean] = Field(response='String', default=True)
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    specified_by_url: typing.Optional[Boolean] = Field(response='String', alias='specifiedByURL', default=True)
-    fields: typing.Optional[__Field] = Field(response='__Field')
-    interfaces: typing.Optional[__Type] = Field(response='__Type')
-    possible_types: typing.Optional[__Type] = Field(response='__Type', alias='possibleTypes')
-    enum_values: typing.Optional[__EnumValue] = Field(response='__EnumValue', alias='enumValues')
-    input_fields: typing.Optional[__InputValue] = Field(response='__InputValue', alias='inputFields')
-    of_type: typing.Optional[__Type] = Field(response='__Type', alias='ofType')
-
-
-class __Field(Payload):
-    name: typing.Optional[Boolean] = Field(response='String', default=True)
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    args: typing.Optional[__InputValue] = Field(response='__InputValue')
-    type: typing.Optional[__Type] = Field(response='__Type')
-    is_deprecated: typing.Optional[Boolean] = Field(response='Boolean', alias='isDeprecated', default=True)
-    deprecation_reason: typing.Optional[Boolean] = Field(response='String', alias='deprecationReason', default=True)
-
-
-class __InputValue(Payload):
-    name: typing.Optional[Boolean] = Field(response='String', default=True)
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    type: typing.Optional[__Type] = Field(response='__Type')
-    default_value: typing.Optional[Boolean] = Field(response='String', alias='defaultValue', default=True)
-    is_deprecated: typing.Optional[Boolean] = Field(response='Boolean', alias='isDeprecated', default=True)
-    deprecation_reason: typing.Optional[Boolean] = Field(response='String', alias='deprecationReason', default=True)
-
-
-class __EnumValue(Payload):
-    name: typing.Optional[Boolean] = Field(response='String', default=True)
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    is_deprecated: typing.Optional[Boolean] = Field(response='Boolean', alias='isDeprecated', default=True)
-    deprecation_reason: typing.Optional[Boolean] = Field(response='String', alias='deprecationReason', default=True)
-
-
-class __Directive(Payload):
-    name: typing.Optional[Boolean] = Field(response='String', default=True)
-    description: typing.Optional[Boolean] = Field(response='String', default=True)
-    is_repeatable: typing.Optional[Boolean] = Field(response='Boolean', alias='isRepeatable', default=True)
-    locations: typing.Optional[Boolean] = Field(response='__DirectiveLocation', default=True)
-    args: typing.Optional[__InputValue] = Field(response='__InputValue')
-
-
 Node.update_forward_refs()
 BaseGraphNode.update_forward_refs()
 FilterDevicesInput.update_forward_refs()
@@ -1029,9 +941,3 @@ CloseTransactionMutation.update_forward_refs()
 RevertChangesMutation.update_forward_refs()
 UpdateGraphNodeCoordinatesMutation.update_forward_refs()
 UniconfigShellSubscription.update_forward_refs()
-__Schema.update_forward_refs()
-__Type.update_forward_refs()
-__Field.update_forward_refs()
-__InputValue.update_forward_refs()
-__EnumValue.update_forward_refs()
-__Directive.update_forward_refs()

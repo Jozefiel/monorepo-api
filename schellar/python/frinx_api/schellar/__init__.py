@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import typing
 
-from pydantic import Field
-
-from frinx.graphql_types import ENUM
+from graphql_pydantic_converter.graphql_types import ENUM
 from graphql_pydantic_converter.graphql_types import Input
 from graphql_pydantic_converter.graphql_types import Mutation
 from graphql_pydantic_converter.graphql_types import Payload
 from graphql_pydantic_converter.graphql_types import Query
+from pydantic import Field
 
 Boolean: typing.TypeAlias = bool
 DateTime: typing.TypeAlias = typing.Any
