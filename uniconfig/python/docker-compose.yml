@@ -9,27 +9,15 @@ services:
       - uniconfig-swagger:/home/api
 
   converter:
-    image: koxudaxi/datamodel-code-generator
+    build:
+      context: .
     depends_on:
       uniconfig-controller:
         condition: service_completed_successfully
     volumes:
-      - ./frinx_api/uniconfig/:/home/
-      - uniconfig-swagger:/home/api
-    command:
-      - --disable-timestamp
-      - --enable-version-header
-      - --use-schema-description
-      - --use-field-description
-      - --allow-population-by-field-name
-      - --use-standard-collections
-      - --reuse-model
-      - --openapi-scopes
-      - paths
-      - --input
-      - /home/api/uniconfigV3.yaml
-      - --output
-      - /home/
+      - ./frinx_api/uniconfig/:/api/
+      - uniconfig-swagger:/swagger
+
 volumes:
   uniconfig-swagger:
     name: uniconfig-swagger

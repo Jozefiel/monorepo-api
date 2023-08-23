@@ -43,23 +43,16 @@ jobs:
           echo "${IMAGE_NAMESPACE} ${IMAGE_REPO} ${IMAGE_TAG}"
           docker compose -f ${IMAGE_REPO}/python/docker-compose.yml up -d
 
-      - name: Check changed files
-        uses: tj-actions/verify-changed-files@v16
-        id: verify-changed-files
-
-      - if: steps.verify-changed-files.outputs.files_changed == 'true'
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - if: steps.verify-changed-files.outputs.files_changed == 'true'
-        name: Run image
+      - name: Run image
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: "1.4.2"
 
       - name: Formatting and validating
-        if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
           pushd ${IMAGE_REPO}/python/ || exit 1
             poetry install
@@ -67,6 +60,11 @@ jobs:
             poetry run mypy .
             poetry run pyright .
           popd || exit 1
+
+      - name: Check changed files
+        uses: tj-actions/verify-changed-files@v16
+        id: verify-changed-files
+
       - name: Update changelog
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
@@ -78,7 +76,7 @@ jobs:
           
           echo $LAST_DOCKER_TAG $LAST_LIB_VERSION
           
-          LIB_VERSION=$(${SCRIPT_PATH}/versioning \
+          LIB_VERSION=$(${SCRIPT_PATH}/bump-version \
               --last-image ${LAST_DOCKER_TAG} \
               --new-image ${IMAGE_TAG} \
               --last-lib ${LAST_LIB_VERSION})
