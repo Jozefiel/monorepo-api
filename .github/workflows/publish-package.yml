@@ -18,15 +18,15 @@ jobs:
         with:
           filters: |
             inventory/python:
-              - 'inventory/python/**'
+              - 'inventory/python/RELEASE.md'
             resource-manager/python:
-              - 'resource-manager/python/**'
+              - 'resource-manager/python/RELEASE.md'
             schellar/python:
-              - 'schellar/python/**'
+              - 'schellar/python/RELEASE.md'
             topology-discovery/python:
-              - 'topology-discovery/python/**'
+              - 'topology-discovery/python/RELEASE.md'
             uniconfig/python:
-              - 'uniconfig/python/**'
+              - 'uniconfig/python/RELEASE.md'
 
   build-n-publish-pypi:
     needs: changes
@@ -48,4 +48,12 @@ jobs:
       - name: poetry publish
         run: |
           cd ${{ matrix.package }}
+          echo "PACKAGE_TAG=$(poetry version | sed 's| |_v|g')" >> "$GITHUB_ENV"
+          echo "DOCKER_TAG=$(cat RELEASE.md | grep "$(poetry version --short)" | cut -d '|' -f 2)" >> "$GITHUB_ENV"
           poetry publish --build --dry-run  # -u "__token__" -p "${{ secrets.PYPI_TOKEN }}"
+      - uses: rickstaa/action-create-tag@v1
+        id: tag_create
+        with:
+          tag: ${{ env.PACKAGE_TAG }}
+          tag_exists_error: false
+          message: Release of ${{ env.PACKAGE_TAG }} for image with tag ${{ env.DOCKER_TAG }}
